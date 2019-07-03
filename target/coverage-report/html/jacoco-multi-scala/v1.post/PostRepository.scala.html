@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PostRepository.scala</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jacoco-multi scala</a> &gt; <a href="../index.html" class="el_bundle">jacoco-multi-scala</a> &gt; <a href="index.source.html" class="el_package">v1.post</a> &gt; <span class="el_source">PostRepository.scala</span></div><h1>PostRepository.scala</h1><pre class="source lang-java linenums">package v1.post
+
+import javax.inject.{Inject, Singleton}
+
+import akka.actor.ActorSystem
+import play.api.libs.concurrent.CustomExecutionContext
+import play.api.{Logger, MarkerContext}
+
+import scala.concurrent.Future
+
+<span class="pc bnc" id="L11" title="All 28 branches missed.">final case class PostData(id: PostId, title: String, body: String)</span>
+
+<span class="nc bnc" id="L13" title="All 8 branches missed.">class PostId private (val underlying: Int) extends AnyVal {</span>
+<span class="pc" id="L14">  override def toString: String = underlying.toString</span>
+}
+
+<span class="fc" id="L17">object PostId {</span>
+  def apply(raw: String): PostId = {
+<span class="pc bpc" id="L19" title="1 of 2 branches missed.">    require(raw != null)</span>
+<span class="fc" id="L20">    new PostId(Integer.parseInt(raw))</span>
+  }
+}
+
+<span class="fc" id="L24">class PostExecutionContext @Inject()(actorSystem: ActorSystem)</span>
+<span class="fc" id="L25">    extends CustomExecutionContext(actorSystem, &quot;repository.dispatcher&quot;)</span>
+
+/**
+  * A pure non-blocking interface for the PostRepository.
+  */
+trait PostRepository {
+  def create(data: PostData)(implicit mc: MarkerContext): Future[PostId]
+
+  def list()(implicit mc: MarkerContext): Future[Iterable[PostData]]
+
+  def get(id: PostId)(implicit mc: MarkerContext): Future[Option[PostData]]
+}
+
+/**
+  * A trivial implementation for the Post Repository.
+  *
+  * A custom execution context is used here to establish that blocking operations should be
+  * executed in a different thread than Play's ExecutionContext, which is used for CPU bound tasks
+  * such as rendering.
+  */
+@Singleton
+<span class="fc" id="L46">class PostRepositoryImpl @Inject()()(implicit ec: PostExecutionContext)</span>
+<span class="fc" id="L47">    extends PostRepository {</span>
+
+<span class="fc" id="L49">  private val logger = Logger(this.getClass)</span>
+
+<span class="fc" id="L51">  private val postList = List(</span>
+<span class="fc" id="L52">    PostData(PostId(&quot;1&quot;), &quot;title 1&quot;, &quot;blog post 1&quot;),</span>
+<span class="fc" id="L53">    PostData(PostId(&quot;2&quot;), &quot;title 2&quot;, &quot;blog post 2&quot;),</span>
+<span class="fc" id="L54">    PostData(PostId(&quot;3&quot;), &quot;title 3&quot;, &quot;blog post 3&quot;),</span>
+<span class="fc" id="L55">    PostData(PostId(&quot;4&quot;), &quot;title 4&quot;, &quot;blog post 4&quot;),</span>
+<span class="fc" id="L56">    PostData(PostId(&quot;5&quot;), &quot;title 5&quot;, &quot;blog post 5&quot;)</span>
+  )
+
+  override def list()(
+      implicit mc: MarkerContext): Future[Iterable[PostData]] = {
+<span class="fc" id="L61">    Future {</span>
+      logger.trace(s&quot;list: &quot;)
+      postList
+    }
+  }
+
+  override def get(id: PostId)(
+      implicit mc: MarkerContext): Future[Option[PostData]] = {
+<span class="nc" id="L69">    Future {</span>
+      logger.trace(s&quot;get: id = $id&quot;)
+      postList.find(post =&gt; post.id == id)
+    }
+  }
+
+  def create(data: PostData)(implicit mc: MarkerContext): Future[PostId] = {
+<span class="nc" id="L76">    Future {</span>
+      logger.trace(s&quot;create: data = $data&quot;)
+      data.id
+    }
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

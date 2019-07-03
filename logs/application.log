@@ -1,0 +1,17 @@
+2019-07-02 15:13:55,032 [INFO] from play.api.http.EnabledFilters in play-dev-mode-akka.actor.default-dispatcher-6 - Enabled Filters (see <https://www.playframework.com/documentation/latest/Filters>):
+
+    play.filters.csrf.CSRFFilter
+    play.filters.headers.SecurityHeadersFilter
+    play.filters.hosts.AllowedHostsFilter
+
+2019-07-02 15:13:55,041 [INFO] from play.api.Play in play-dev-mode-akka.actor.default-dispatcher-6 - Application started (Dev) (no global state)
+2019-07-02 15:13:55,239 [TRACE] from v1.post.PostActionBuilder in application-akka.actor.default-dispatcher-3 - invokeBlock: 
+2019-07-02 15:13:55,240 [TRACE] from v1.post.PostController in application-akka.actor.default-dispatcher-3 - index: 
+2019-07-02 15:13:55,241 [TRACE] from v1.post.PostRepositoryImpl in application-repository.dispatcher-4 - list: 
+2019-07-02 15:14:00,155 [TRACE] from v1.post.PostActionBuilder in application-akka.actor.default-dispatcher-2 - invokeBlock: 
+2019-07-02 15:14:00,155 [TRACE] from v1.post.PostController in application-akka.actor.default-dispatcher-2 - index: 
+2019-07-02 15:14:00,156 [TRACE] from v1.post.PostRepositoryImpl in application-repository.dispatcher-5 - list: 
+2019-07-02 15:14:13,768 [TRACE] from v1.post.PostActionBuilder in application-akka.actor.default-dispatcher-2 - invokeBlock: 
+2019-07-02 15:14:13,768 [TRACE] from v1.post.PostController in application-akka.actor.default-dispatcher-2 - index: 
+2019-07-02 15:14:13,769 [TRACE] from v1.post.PostRepositoryImpl in application-repository.dispatcher-6 - list: 
+2019-07-02 15:14:20,691 [INFO] from play.core.server.AkkaHttpServer in play-dev-mode-shutdown-hook-1 - Stopping server...

@@ -1,0 +1,6 @@
+[0m[[0m[0mdebug[0m] [0m[0mCopy resource mappings: [0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/conf/logback.xml,/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/target/scala-2.12/classes/logback.xml)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/conf/secure.conf,/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/target/scala-2.12/classes/secure.conf)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/conf/generated.keystore,/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/target/scala-2.12/classes/generated.keystore)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/conf/application.conf,/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/target/scala-2.12/classes/application.conf)[0m
+[0m[[0m[0mdebug[0m] [0m[0m	(/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/conf/routes,/Users/volodymyrbilyi/Downloads/play-samples-2.7.x/play-scala-rest-api-example/target/scala-2.12/classes/routes)[0m

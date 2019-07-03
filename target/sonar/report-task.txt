@@ -1,0 +1,6 @@
+projectKey=scala-api
+serverUrl=http://localhost:9000
+serverVersion=7.9.0.26994
+dashboardUrl=http://localhost:9000/dashboard?id=scala-api
+ceTaskId=AWuy9TKryow03rNioV9M
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AWuy9TKryow03rNioV9M

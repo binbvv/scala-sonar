@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PostResourceHandler.scala</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jacoco-multi scala</a> &gt; <a href="../index.html" class="el_bundle">jacoco-multi-scala</a> &gt; <a href="index.source.html" class="el_package">v1.post</a> &gt; <span class="el_source">PostResourceHandler.scala</span></div><h1>PostResourceHandler.scala</h1><pre class="source lang-java linenums">package v1.post
+
+import javax.inject.{Inject, Provider}
+
+import play.api.MarkerContext
+
+import scala.concurrent.{ExecutionContext, Future}
+import play.api.libs.json._
+
+/**
+  * DTO for displaying post information.
+  */
+<span class="pc bpc" id="L13" title="40 of 41 branches missed.">case class PostResource(id: String, link: String, title: String, body: String)</span>
+
+<span class="pc" id="L15">object PostResource {</span>
+  /**
+    * Mapping to read/write a PostResource out as a JSON value.
+    */
+<span class="fc" id="L19">    implicit val format: Format[PostResource] = Json.format</span>
+}
+
+
+/**
+  * Controls access to the backend data, returning [[PostResource]]
+  */
+<span class="fc" id="L26">class PostResourceHandler @Inject()(</span>
+<span class="fc" id="L27">    routerProvider: Provider[PostRouter],</span>
+<span class="fc" id="L28">    postRepository: PostRepository)(implicit ec: ExecutionContext) {</span>
+
+  def create(postInput: PostFormInput)(
+      implicit mc: MarkerContext): Future[PostResource] = {
+<span class="nc" id="L32">    val data = PostData(PostId(&quot;999&quot;), postInput.title, postInput.body)</span>
+    // We don't actually create the post, so return what we have
+<span class="nc" id="L34">    postRepository.create(data).map { id =&gt;</span>
+      createPostResource(data)
+    }
+  }
+
+  def lookup(id: String)(
+      implicit mc: MarkerContext): Future[Option[PostResource]] = {
+<span class="nc" id="L41">    val postFuture = postRepository.get(PostId(id))</span>
+<span class="nc" id="L42">    postFuture.map { maybePostData =&gt;</span>
+      maybePostData.map { postData =&gt;
+        createPostResource(postData)
+      }
+    }
+  }
+
+  def find(implicit mc: MarkerContext): Future[Iterable[PostResource]] = {
+<span class="fc" id="L50">    postRepository.list().map { postDataList =&gt;</span>
+      postDataList.map(postData =&gt; createPostResource(postData))
+    }
+  }
+
+  private def createPostResource(p: PostData): PostResource = {
+<span class="fc" id="L56">    PostResource(p.id.toString, routerProvider.get.link(p.id), p.title, p.body)</span>
+  }
+
+<span class="fc" id="L59">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

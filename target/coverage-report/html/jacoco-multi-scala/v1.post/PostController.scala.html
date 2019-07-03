@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PostController.scala</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jacoco-multi scala</a> &gt; <a href="../index.html" class="el_bundle">jacoco-multi-scala</a> &gt; <a href="index.source.html" class="el_package">v1.post</a> &gt; <span class="el_source">PostController.scala</span></div><h1>PostController.scala</h1><pre class="source lang-java linenums">package v1.post
+
+import javax.inject.Inject
+
+import play.api.Logger
+import play.api.data.Form
+import play.api.libs.json.Json
+import play.api.mvc._
+
+import scala.concurrent.{ExecutionContext, Future}
+
+<span class="nc bnc" id="L12" title="All 27 branches missed.">case class PostFormInput(title: String, body: String)</span>
+
+/**
+  * Takes HTTP requests and produces JSON.
+  */
+<span class="fc" id="L17">class PostController @Inject()(cc: PostControllerComponents)(</span>
+<span class="fc" id="L18">    implicit ec: ExecutionContext)</span>
+<span class="fc" id="L19">    extends PostBaseController(cc) {</span>
+
+<span class="fc" id="L21">  private val logger = Logger(getClass)</span>
+
+<span class="pc" id="L23">  private val form: Form[PostFormInput] = {</span>
+    import play.api.data.Forms._
+
+<span class="fc" id="L26">    Form(</span>
+<span class="fc" id="L27">      mapping(</span>
+<span class="fc" id="L28">        &quot;title&quot; -&gt; nonEmptyText,</span>
+<span class="fc" id="L29">        &quot;body&quot; -&gt; text</span>
+<span class="fc" id="L30">      )(PostFormInput.apply)(PostFormInput.unapply)</span>
+    )
+  }
+
+<span class="fc" id="L34">  def index: Action[AnyContent] = PostAction.async { implicit request =&gt;</span>
+    logger.trace(&quot;index: &quot;)
+    postResourceHandler.find.map { posts =&gt;
+      Ok(Json.toJson(posts))
+    }
+  }
+
+<span class="nc" id="L41">  def process: Action[AnyContent] = PostAction.async { implicit request =&gt;</span>
+    logger.trace(&quot;process: &quot;)
+    processJsonPost()
+  }
+
+<span class="nc" id="L46">  def show(id: String): Action[AnyContent] = PostAction.async {</span>
+<span class="nc" id="L47">    implicit request =&gt;</span>
+      logger.trace(s&quot;show: id = $id&quot;)
+      postResourceHandler.lookup(id).map { post =&gt;
+        Ok(Json.toJson(post))
+      }
+  }
+
+  private def processJsonPost[A]()(
+      implicit request: PostRequest[A]): Future[Result] = {
+    def failure(badForm: Form[PostFormInput]) = {
+<span class="nc" id="L57">      Future.successful(BadRequest(badForm.errorsAsJson))</span>
+    }
+
+    def success(input: PostFormInput) = {
+<span class="nc" id="L61">      postResourceHandler.create(input).map { post =&gt;</span>
+        Created(Json.toJson(post)).withHeaders(LOCATION -&gt; post.link)
+      }
+    }
+
+<span class="nc" id="L66">    form.bindFromRequest().fold(failure, success)</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>

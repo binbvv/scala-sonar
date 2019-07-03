@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PostActionBuilder.scala</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">jacoco-multi scala</a> &gt; <a href="../index.html" class="el_bundle">jacoco-multi-scala</a> &gt; <a href="index.source.html" class="el_package">v1.post</a> &gt; <span class="el_source">PostActionBuilder.scala</span></div><h1>PostActionBuilder.scala</h1><pre class="source lang-java linenums">package v1.post
+
+import javax.inject.Inject
+
+import net.logstash.logback.marker.LogstashMarker
+import play.api.{Logger, MarkerContext}
+import play.api.http.{FileMimeTypes, HttpVerbs}
+import play.api.i18n.{Langs, MessagesApi}
+import play.api.mvc._
+
+import scala.concurrent.{ExecutionContext, Future}
+
+/**
+  * A wrapped request for post resources.
+  *
+  * This is commonly used to hold request-specific information like
+  * security credentials, and useful shortcut methods.
+  */
+trait PostRequestHeader
+    extends MessagesRequestHeader
+    with PreferredMessagesProvider
+<span class="pc bnc" id="L22" title="All 4 branches missed.">class PostRequest[A](request: Request[A], val messagesApi: MessagesApi)</span>
+<span class="fc" id="L23">    extends WrappedRequest(request)</span>
+    with PostRequestHeader
+
+/**
+  * Provides an implicit marker that will show the request in all logger statements.
+  */
+<span class="fc" id="L29">trait RequestMarkerContext {</span>
+  import net.logstash.logback.marker.Markers
+
+<span class="fc" id="L32">  private def marker(tuple: (String, Any)) = Markers.append(tuple._1, tuple._2)</span>
+
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">  private implicit class RichLogstashMarker(marker1: LogstashMarker) {</span>
+<span class="fc" id="L35">    def &amp;&amp;(marker2: LogstashMarker): LogstashMarker = marker1.and(marker2)</span>
+  }
+
+<span class="fc" id="L38">  implicit def requestHeaderToMarkerContext(</span>
+      implicit request: RequestHeader): MarkerContext = {
+<span class="fc" id="L40">    MarkerContext {</span>
+<span class="fc" id="L41">      marker(&quot;id&quot; -&gt; request.id) &amp;&amp; marker(&quot;host&quot; -&gt; request.host) &amp;&amp; marker(</span>
+<span class="fc" id="L42">        &quot;remoteAddress&quot; -&gt; request.remoteAddress)</span>
+    }
+  }
+
+}
+
+/**
+  * The action builder for the Post resource.
+  *
+  * This is the place to put logging, metrics, to augment
+  * the request with contextual data, and manipulate the
+  * result.
+  */
+<span class="pc" id="L55">class PostActionBuilder @Inject()(messagesApi: MessagesApi,</span>
+                                  playBodyParsers: PlayBodyParsers)(
+<span class="fc" id="L57">    implicit val executionContext: ExecutionContext)</span>
+<span class="fc" id="L58">    extends ActionBuilder[PostRequest, AnyContent]</span>
+    with RequestMarkerContext
+    with HttpVerbs {
+
+<span class="fc" id="L62">  override val parser: BodyParser[AnyContent] = playBodyParsers.anyContent</span>
+
+  type PostRequestBlock[A] = PostRequest[A] =&gt; Future[Result]
+
+<span class="fc" id="L66">  private val logger = Logger(this.getClass)</span>
+
+  override def invokeBlock[A](request: Request[A],
+                              block: PostRequestBlock[A]): Future[Result] = {
+    // Convert to marker context and use request in block
+<span class="fc" id="L71">    implicit val markerContext: MarkerContext = requestHeaderToMarkerContext(</span>
+<span class="fc" id="L72">      request)</span>
+<span class="fc" id="L73">    logger.trace(s&quot;invokeBlock: &quot;)</span>
+
+<span class="fc" id="L75">    val future = block(new PostRequest(request, messagesApi))</span>
+
+<span class="fc" id="L77">    future.map { result =&gt;</span>
+      request.method match {
+        case GET | HEAD =&gt;
+          result.withHeaders(&quot;Cache-Control&quot; -&gt; s&quot;max-age: 100&quot;)
+        case other =&gt;
+          result
+      }
+    }
+  }
+}
+
+/**
+  * Packages up the component dependencies for the post controller.
+  *
+  * This is a good way to minimize the surface area exposed to the controller, so the
+  * controller only has to have one thing injected.
+  */
+<span class="pc bnc" id="L94" title="All 69 branches missed.">case class PostControllerComponents @Inject()(</span>
+<span class="pc" id="L95">    postActionBuilder: PostActionBuilder,</span>
+<span class="pc" id="L96">    postResourceHandler: PostResourceHandler,</span>
+<span class="pc" id="L97">    actionBuilder: DefaultActionBuilder,</span>
+<span class="pc" id="L98">    parsers: PlayBodyParsers,</span>
+<span class="pc" id="L99">    messagesApi: MessagesApi,</span>
+<span class="pc" id="L100">    langs: Langs,</span>
+<span class="pc" id="L101">    fileMimeTypes: FileMimeTypes,</span>
+<span class="pc" id="L102">    executionContext: scala.concurrent.ExecutionContext)</span>
+<span class="fc" id="L103">    extends ControllerComponents</span>
+
+/**
+  * Exposes actions and handler to the PostController by wiring the injected state into the base class.
+  */
+<span class="pc bnc" id="L108" title="All 16 branches missed.">class PostBaseController @Inject()(pcc: PostControllerComponents)</span>
+<span class="fc" id="L109">    extends BaseController</span>
+    with RequestMarkerContext {
+<span class="nc" id="L111">  override protected def controllerComponents: ControllerComponents = pcc</span>
+
+<span class="fc" id="L113">  def PostAction: PostActionBuilder = pcc.postActionBuilder</span>
+
+<span class="fc" id="L115">  def postResourceHandler: PostResourceHandler = pcc.postResourceHandler</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.4.201905082037</span></div></body></html>
