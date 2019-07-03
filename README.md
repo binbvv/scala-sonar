@@ -1,71 +1,39 @@
-# Play REST API
+# System (E2E) tests of Scala application with Jacoco and Sonar test coverage
 
-This is the example project for [Making a REST API in Play](http://developer.lightbend.com/guides/play-rest-api/index.html).
+#### Setup
+- Have jacocoagent.jar file (it is in project directory in our case)
+- Have pom.xml file to run jacoco tasks (also in project directory)
+- Have local [sonar](https://www.sonarqube.org/downloads/) instance running (e.g. on port 9001)
+- Create sonar project (scala-sonar in our case)
+- [sonar-scanner](https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/) should be added to PATH.
+- Set sbt options:
 
-## Appendix
-
-### Running
-
-You need to download and install sbt for this application to run.
-
-Once you have sbt installed, the following at the command prompt will start up Play in development mode:
+```bash
+export SBT_OPTS="-javaagent:jacocoagent.jar=destfile=jacoco-it.exec,output=file,append=true,dumponexit=true"
+```
+#### Run AUT and perform tests
+Run scala application: 
 
 ```bash
 sbt run
 ```
+Application is up and running on localhost:9000  <br/>
 
-Play will start up on the HTTP port at <http://localhost:9000/>.   You don't need to deploy or reload anything -- changing any source code while the server is running will automatically recompile and hot-reload the application on the next HTTP request. 
+At this point, we can run system e2e tests. Let's emulate some test case:
+```bash
+GET http://localhost:9000/v1/posts
+```
 
-### Usage
-
-If you call the same URL from the command line, you’ll see JSON. Using httpie, we can execute the command:
+#### Get results
+In order to get jacoco report, we should stop application under test. <br/>
+Generate Jacoco report with maven: 
+```bash
+mvn antrun:run@generate-report -Dskip.int.tests.report=false
+```
+In order to export jacoco report to Sonar, we should know path to jacoco coverage result xml file. 
+It is target/coverage-report/coverage-report.xml.<br/>
 
 ```bash
-http --verbose http://localhost:9000/v1/posts
+sonar-scanner -Dsonar.projectKey=scala-sonar -Dsonar.sources=app -Dsonar.host.url=http://localhost:9001 -Dsonar.login=5ba67cce94830ebec270975bb32ede25868e0cc1 -Dsonar.coverage.jacoco.xmlReportPaths=target/coverage-report/coverage-report.xml
 ```
-
-and get back:
-
-```routes
-GET /v1/posts HTTP/1.1
-```
-
-Likewise, you can also send a POST directly as JSON:
-
-```bash
-http --verbose POST http://localhost:9000/v1/posts title="hello" body="world"
-```
-
-and get:
-
-```routes
-POST /v1/posts HTTP/1.1
-```
-
-### Load Testing
-
-The best way to see what Play can do is to run a load test.  We've included Gatling in this test project for integrated load testing.
-
-Start Play in production mode, by [staging the application](https://www.playframework.com/documentation/2.5.x/Deploying) and running the play script:s
-
-```bash
-sbt stage
-cd target/universal/stage
-./bin/play-scala-rest-api-example -Dplay.http.secret.key=some-long-key-that-will-be-used-by-your-application
-```
-
-Then you'll start the Gatling load test up (it's already integrated into the project):
-
-```bash
-sbt gatling:test
-```
-
-For best results, start the gatling load test up on another machine so you do not have contending resources.  You can edit the [Gatling simulation](http://gatling.io/docs/2.2.2/general/simulation_structure.html#simulation-structure), and change the numbers as appropriate.
-
-Once the test completes, you'll see an HTML file containing the load test chart:
-
-```bash
- ./rest-api/target/gatling/gatlingspec-1472579540405/index.html
-```
-
-That will contain your load test results.
+Sonar report is available at http://localhost:9001/dashboard?id=scala-sonar <br/>
