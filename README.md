@@ -1,5 +1,9 @@
 # System (E2E) tests of Scala application with Jacoco and Sonar test coverage
 
+### Introduction
+Simple scala application taken from Play Framework Scala examples:
+https://github.com/playframework/play-samples/tree/2.7.x/play-scala-rest-api-example
+
 #### Setup
 - Have jacocoagent.jar file (it is in project directory in our case)
 - Have pom.xml file to run jacoco tasks (also in project directory)
