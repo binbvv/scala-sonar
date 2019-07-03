@@ -1,6 +1,6 @@
 # System (E2E) tests of Scala application with Jacoco and Sonar test coverage
 
-### Introduction
+#### Introduction
 Simple Scala application taken from Play Framework Scala examples:
 https://github.com/playframework/play-samples/tree/2.7.x/play-scala-rest-api-example <br/>
 In order to get code coverage of running application, we use 
