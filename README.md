@@ -45,7 +45,3 @@ It is target/coverage-report/coverage-report.xml.<br/>
 sonar-scanner -Dsonar.projectKey=scala-sonar -Dsonar.sources=app -Dsonar.host.url=http://localhost:9001 -Dsonar.login=5ba67cce94830ebec270975bb32ede25868e0cc1 -Dsonar.coverage.jacoco.xmlReportPaths=target/coverage-report/coverage-report.xml
 ```
 Sonar report is available at http://localhost:9001/dashboard?id=scala-sonar <br/>
-
-#### Options
-Jacoco agent can be run as a web server, in this case AUT should not be stopped to get coverage results.
-But it is not a good idea from security point of view.
